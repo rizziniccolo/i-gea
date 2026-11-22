@@ -1,0 +1,38 @@
+# ============================================================
+# Kinect Rehab Coach - Dipendenze Python
+# ============================================================
+# Installazione:
+#   pip install -r requirements.txt
+#
+# Requisiti di sistema (non installabili via pip):
+#   - Python 3.10 o superiore
+#   - Kinect for Windows SDK 2.0 (runtime Microsoft)
+#   - Docker Desktop (per n8n)
+#   - Porta USB 3.0 nativa per il sensore Kinect V2
+#
+# Voci TTS italiane:
+#   Su Windows, installare almeno una voce SAPI5 italiana tramite
+#   Impostazioni > Data/ora e lingua > Riconoscimento vocale > Aggiungi voce.
+#   Se assente, pyttsx3 usa la voce di default del sistema.
+# ============================================================
+
+# --- Sensore Kinect V2 ---
+# Libreria Python per l'acquisizione dei flussi colore, profondità e scheletro
+# dal sensore Microsoft Kinect V2. Richiede Kinect SDK 2.0 installato.
+kinect-next>=1.0.0
+
+# --- Visione e rendering ---
+# OpenCV per il rendering dell'interfaccia (finestra, pannelli, scheletro,
+# anteprima animata). Include numpy come dipendenza automatica.
+opencv-python>=4.8.0
+
+# --- Comunicazione HTTP ---
+# Client HTTP per le chiamate asincrone verso i webhook n8n.
+# Usato in n8n_client.py.
+requests>=2.31.0
+
+# --- Sintesi vocale ---
+# Text-to-speech locale. Su Windows usa SAPI5, su macOS NSSpeechSynthesizer,
+# su Linux espeak. Usato in tts_manager.py.
+# Richiede pywin32 (installato automaticamente su Windows).
+pyttsx3>=2.90
