@@ -6,7 +6,22 @@ Autori: Gamba Benedetta, Rizzi Niccolò, Zuccaretti Chiara
 
 Anno scolastico 2026-2027
 
+---
+### Proprietà intellettuale e uso del codice
 
+Il progetto è stato sviluppato dagli autori nell'ambito del programma
+bioERGOtech, in qualità di partecipanti. La partecipazione al programma non
+costituisce cessione dei diritti di proprietà intellettuale sugli elaborati
+prodotti, salvo diversa disposizione nei termini della competizione.
+
+I diritti morali e patrimoniali sul codice sorgente, sulla documentazione e
+sui materiali prodotti appartengono agli autori. Il repository è pubblico per
+permettere la valutazione del progetto. La licenza scelta (vedi file LICENSE
+nella root del repository) specifica i termini di utilizzo.
+
+In assenza di licenza open source esplicita, il codice è protetto da copyright
+e non può essere riutilizzato, distribuito o modificato senza il consenso
+scritto degli autori.
 ---
 
 ## Introduzione
