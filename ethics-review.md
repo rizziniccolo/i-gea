@@ -3,7 +3,9 @@
 ##i-Gea Kinect Rehab Coach — Sistema agentico multi-AI per la riabilitazione fisioterapica
 
 Autori: Gamba Benedetta, Rizzi Niccolò, Zuccaretti Chiara
+
 Anno scolastico 2026-2027
+
 
 ---
 
