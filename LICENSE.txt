@@ -1,0 +1,12 @@
+Copyright (c) 2026 Benedetta Gamba, Niccolò Rizzi, Chiara Zuccaretti
+
+All rights reserved.
+
+This software and its associated documentation are the intellectual property
+of the authors. The project was created by the authors as part of the
+bioERGOtech program; participation in the program does not constitute a
+transfer of intellectual property rights, unless otherwise stated in the
+competition terms.
+
+No part of this software may be reproduced, distributed, modified, or used
+for commercial purposes without the explicit written permission of the authors.
