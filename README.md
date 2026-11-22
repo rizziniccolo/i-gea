@@ -5,7 +5,22 @@ Anno scolastico 2026/2027
 Autori: Gamba Benedetta, Rizzi Niccolò, Zuccaretti Chiara
 
 ---
+## Proprietà intellettuale
 
+Il codice sorgente, la documentazione e i materiali del progetto Kinect Rehab Coach
+sono di proprietà intellettuale di Gamba Benedetta, Rizzi Niccolò, Zuccaretti Chiara.
+
+Il progetto è stato sviluppato dagli autori nell'ambito del programma bioERGOtech —
+Agentic AI High School Innovation Program, in qualità di partecipanti. La
+partecipazione al programma non costituisce cessione dei diritti di proprietà
+intellettuale sugli elaborati prodotti, salvo diversa disposizione nei termini
+della competizione.
+
+Il repository è pubblico per permettere la valutazione del progetto. Salvo diversa
+indicazione esplicita, tutti i diritti sono riservati.
+
+Per richieste di utilizzo, collaborazione o licenza, contattare gli autori.
+---
 ## Indice
 
 1. Panoramica
