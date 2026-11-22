@@ -1,8 +1,8 @@
 # i-gea
 i-Gea Kinect Rehab Coach  Sistema agentico multi-AI per la riabilitazione fisioterapica guidata da sensore Kinect V2.
 
-Autori: Benedetta Gamba, Niccolò Rizzi, Chiara Zuccaretti
-Progetto sviluppato per bioERGOtech — Agentic AI High School Innovation Program
+Anno scolastico 2026/2027
+Autori: Gamba Benedetta, Rizzi Niccolò, Zuccaretti Chiara
 
 ---
 
@@ -565,6 +565,7 @@ I parametri principali sono definiti come costanti nei file Python.
 ## 12. Formati dei dati scambiati
 
 **Richiesta di generazione programma (Python -> n8n)**
+
 ```json
 {
   "action": "generate_recipe",
@@ -574,12 +575,13 @@ I parametri principali sono definiti come costanti nei file Python.
   "revision_note": "string",
   "previous_program": { ... }
 }
+```
 
-I campi answers, previous_questions, revision_note e previous_program sono opzionali.
+I campi `answers`, `previous_questions`, `revision_note` e `previous_program` sono opzionali.
 
-Risposta di generazione programma (n8n -> Python)
-json
+**Risposta di generazione programma (n8n -> Python)**
 
+```json
 {
   "action": "clarify",
   "questions": ["string", "..."],
@@ -587,10 +589,10 @@ json
   "_warning": "string"
 }
 ```
-oppure
-```
-json
 
+oppure
+
+```json
 {
   "action": "generate",
   "program": {
@@ -635,9 +637,10 @@ json
   }
 }
 ```
-Evento di valutazione (Python -> n8n)
-json
-```
+
+**Evento di valutazione (Python -> n8n)**
+
+```json
 {
   "action": "evaluate_step",
   "session_id": "string",
@@ -657,16 +660,18 @@ json
   "program_name": "string"
 }
 ```
-Risposta di valutazione (n8n -> Python)
-json
-```
+
+**Risposta di valutazione (n8n -> Python)**
+
+```json
 {
   "feedback": "string"
 }
 ```
-Richiesta di pianificazione (Python -> n8n)
-json
-```
+
+**Richiesta di pianificazione (Python -> n8n)**
+
+```json
 {
   "action": "request_plan",
   "session_id": "string",
@@ -684,9 +689,10 @@ json
   "history": [ ... ]
 }
 ```
-Risposta di pianificazione (n8n -> Python)
-json
-```
+
+**Risposta di pianificazione (n8n -> Python)**
+
+```json
 {
   "plan_delta": {
     "adjust_target": {"joint_id": "shoulder_right", "new_min": 0, "new_max": 30},
@@ -697,9 +703,10 @@ json
   }
 }
 ```
-Richiesta di report (Python -> n8n)
-json
-```
+
+**Richiesta di report (Python -> n8n)**
+
+```json
 {
   "action": "generate_report",
   "session_id": "string",
@@ -722,133 +729,124 @@ json
   ]
 }
 ```
-Risposta di report (n8n -> Python)
-json
-```
+
+**Risposta di report (n8n -> Python)**
+
+```json
 {
   "report": "string"
 }
 ```
-13. Logging e output
 
-debug.log
+---
+
+## 13. Logging e output
+
+**`debug.log`**  
 Contiene tutto l'output del programma: messaggi di stato, log delle chiamate HTTP, errori, traceback. Sovrascritto ad ogni avvio.
 
-reports/session-<timestamp>.txt
+**`reports/session-<timestamp>.txt`**  
 Contiene, per ogni sessione completata:
 
-    ID sessione
+- ID sessione
+- nome programma
+- numero esercizi completati sul totale
+- report narrativo generato dal Reporter
+- program_context completo in formato JSON
 
-    nome programma
-
-    numero esercizi completati sul totale
-
-    report narrativo generato dal Reporter
-
-    program_context completo in formato JSON
-
-Terminale
+**Terminale**  
 Durante la sessione mostra:
 
-    programma generato con istruzioni
+- programma generato con istruzioni
+- avanzamento esercizi e fasi
+- feedback AI ricevuti
+- ricezione di plan_delta
+- eventi di gesto
+- eccezioni con traceback
+- riepilogo finale
 
-    avanzamento esercizi e fasi
+---
 
-    feedback AI ricevuti
+## 14. Costi operativi
 
-    ricezione di plan_delta
+**Costo hardware iniziale**
 
-    eventi di gesto
+- PC Windows: 300-450 euro
+- Kinect V2: 40-70 euro
+- Adattatore: 30-40 euro
+- Cavi: 10-20 euro
+- **Totale: 380-580 euro**
 
-    eccezioni con traceback
+**Costo software**
 
-    riepilogo finale
+- Python: gratuito
+- OpenCV: gratuito
+- n8n Community Edition: gratuito
+- Docker Desktop per uso personale: gratuito
 
-14. Costi operativi
+**Costo API DeepSeek**
 
-Costo hardware iniziale
-
-    PC Windows: 300-450 euro
-
-    Kinect V2: 40-70 euro
-
-    Adattatore: 30-40 euro
-
-    Cavi: 10-20 euro
-    Totale: 380-580 euro
-
-Costo software
-
-    Python: gratuito
-
-    OpenCV: gratuito
-
-    n8n Community Edition: gratuito
-
-    Docker Desktop per uso personale: gratuito
-
-Costo API DeepSeek
 Stimato in circa 0,015 dollari per sessione completa. Il calcolo si basa su:
 
-    una chiamata al Program Designer (v4-pro)
+- una chiamata al Program Designer (v4-pro)
+- una chiamata al Critic (v4-pro)
+- circa 13 chiamate medie tra Orchestratore, Coach e Planner su una sessione di 10 ripetizioni
+- una chiamata al Reporter
 
-    una chiamata al Critic (v4-pro)
+Le tariffe DeepSeek applicate sono quelle della fascia off-peak, con caching attivo.
 
-    circa 13 chiamate medie tra Orchestratore, Coach e Planner su una sessione di 10 ripetizioni
+**Costo energia elettrica**
 
-    una chiamata al Reporter
-    Le tariffe DeepSeek applicate sono quelle della fascia off-peak, con caching attivo.
-
-Costo energia elettrica
 Ipotizzando 60-100 W complessivi per PC e sensore, 8 ore di utilizzo al giorno, 0,27 euro/kWh: 49-79 euro l'anno.
-15. Privacy e sicurezza
 
-Nessun dato visivo lascia il PC
+---
+
+## 15. Privacy e sicurezza
+
+**Nessun dato visivo lascia il PC**  
 Il sistema non invia immagini RGB o mappe di profondità ai servizi AI. Le uniche informazioni trasmesse sono:
 
-    la diagnosi scritta in linguaggio naturale (inviata al Program Designer per la generazione)
+- la diagnosi scritta in linguaggio naturale (inviata al Program Designer per la generazione)
+- i valori numerici degli angoli articolari
+- i valori numerici delle compensazioni
+- la history delle ultime fasi (metadati strutturati)
 
-    i valori numerici degli angoli articolari
+**Nessun dato identificativo**  
+Il payload inviato agli agenti non contiene nome, età, codice fiscale o altri dati personali del paziente. Contiene solo `session_id` (timestamp) e identificativi anonimi degli esercizi.
 
-    i valori numerici delle compensazioni
-
-    la history delle ultime fasi (metadati strutturati)
-
-Nessun dato identificativo
-Il payload inviato agli agenti non contiene nome, età, codice fiscale o altri dati personali del paziente. Contiene solo session_id (timestamp) e identificativi anonimi degli esercizi.
-
-Conservazione locale
+**Conservazione locale**  
 I report sono salvati in locale nel filesystem. Non vengono trasmessi a servizi esterni. Non vengono conservati video o audio.
 
-Human-in-the-loop
+**Human-in-the-loop**  
 Il sistema non decide mai autonomamente di iniziare una sessione o di modificare il programma senza conferma dell'utente. Il paziente approva il programma prima dell'inizio, e può chiedere modifiche.
 
-Nessuna autonomia clinica
+**Nessuna autonomia clinica**  
 Il sistema non è un dispositivo medico. Non formula diagnosi. Non sostituisce il fisioterapista. Le raccomandazioni generate dagli agenti AI sono validate internamente da un Critic, ma restano soggette alla supervisione del professionista sanitario.
 
-16. Limitazioni note
+---
 
-Latenza del feedback AI
+## 16. Limitazioni note
+
+**Latenza del feedback AI**  
 Il feedback locale è istantaneo (calcolato in Python a ogni frame). Il feedback AI ha una latenza di 2-4 secondi, dovuta al tempo di inferenza dei modelli linguistici. Non è ottimizzabile senza cambiare architettura o modello.
 
-Nessuna memoria cross-sessione
+**Nessuna memoria cross-sessione**  
 Il sistema non conserva un profilo del paziente tra sessioni. Ogni sessione riparte da zero. È una scelta di semplicità per il prototipo, non un limite tecnico.
 
-Un solo target per il conteggio
+**Un solo target per il conteggio**  
 Nei esercizi bilaterali, il conteggio delle ripetizioni è effettuato sul primo target dichiarato. Il secondo lato è monitorato per compensazioni ma non contribuisce al conteggio.
 
-Classificazione della postura euristica
+**Classificazione della postura euristica**  
 La distinzione tra seduto, in piedi e le altre posture è basata su soglie euristiche su angoli e distanze. Può sbagliare in casi limite (divano con gambe distese, sgabelli alti).
 
-Nessuna validazione clinica
+**Nessuna validazione clinica**  
 Il sistema è un prototipo tecnologico. Non è stato testato su pazienti reali né validato clinicamente. Non è un dispositivo medico.
 
-Calibrazione soggetta a fallimenti
+**Calibrazione soggetta a fallimenti**  
 Se il range misurato durante la calibrazione è inferiore a 20 gradi, la calibrazione viene rifiutata e l'utente deve ripetere il movimento. È il comportamento corretto, ma può richiedere più tentativi se l'utente non capisce cosa deve fare.
 
-Giunti del Kinect V2
+**Giunti del Kinect V2**  
 Il sensore traccia 25 giunti del corpo, ma non le singole dita né i punti di appoggio dei piedi. Il sistema opera quindi su articolazioni principali (spalle, gomiti, anche, ginocchia, caviglie, colonna) e non su articolazioni fini.
-
 ## 17. Scelta del sensore e alternative future
 
 ### Perché il Kinect V2
@@ -889,7 +887,5 @@ Se in futuro si volesse passare a un sensore ancora in produzione, le alternativ
 
 Il sistema Kinect Rehab Coach è progettato per essere indipendente dal sensore a livello di logica applicativa: il modulo `analisi_angoli.py` e il modulo `stato_step.py` lavorano su coordinate 3D e nomi di giunti, non su API specifiche del Kinect. Sostituire il sensore richiederebbe di adattare il layer di acquisizione (`main_kinect.py`) e il mapper delle coordinate, ma non la logica di calcolo, di calibrazione o di orchestrazione agentica.
 
-Progetto sviluppato per bioERGOtech — Agentic AI High School Innovation Program
-Anno scolastico 2026/2027
 
 Il progetto è distribuito con finalità educative. Non è un dispositivo medico. Non sostituisce il parere di un professionista sanitario.
