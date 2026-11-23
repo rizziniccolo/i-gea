@@ -46,7 +46,7 @@ Il sistema si propone come supporto a un percorso riabilitativo. Questo solleva 
 
 Il sistema elabora dati relativi al corpo del paziente: posizioni dei giunti, angoli articolari, compensazioni posturali, postura rilevata. Anche se non sono immagini, sono dati biometrici e dati sanitari. La domanda è: chi li vede, dove vengono conservati, per quanto tempo, e come possono essere cancellati.
 
-Il sistema utilizza modelli linguistici esterni (DeepSeek) per generare contenuti. Questo solleva domande sulla trasparenza delle decisioni: perché il sistema ha scelto quel programma? Perché ha proposto quella modifica al target? L'utente può capire il ragionamento o è di fronte a una scatola nera?
+Il sistema utilizza modelli linguistici esterni (DeepSeek) per generare contenuti. Questo solleva domande sulla trasparenza delle decisioni: perché il sistema ha scelto quel programma? Perché ha proposto quella modifica al target? L'utente/operatore può capire il ragionamento o è di fronte a una scatola nera?
 
 Infine, il sistema opera in un contesto di fragilità: il paziente in riabilitazione è una persona che sta recuperando da un trauma, un intervento o una patologia. Un errore del sistema, in questo contesto, ha un peso maggiore rispetto a un errore in un contesto di svago.
 
@@ -68,7 +68,7 @@ Un terzo rischio è la latenza. Il feedback locale è istantaneo, ma il feedback
 
 **Rischi legati alla privacy**
 
-Il sistema non invia immagini ai servizi AI. Le uniche informazioni trasmesse sono la diagnosi scritta in linguaggio naturale e i valori numerici degli angoli e delle compensazioni. La diagnosi può contenere informazioni identificative se l'utente la scrive in modo dettagliato (per esempio "Mario Rossi, 45 anni, operato al ginocchio destro il 12 marzo"). Il sistema non impedisce questo, ma non lo richiede e non lo incoraggia.
+Il sistema non invia immagini ai servizi AI. Le uniche informazioni trasmesse sono la diagnosi scritta in linguaggio naturale e i valori numerici degli angoli e delle compensazioni. La diagnosi può contenere informazioni identificative se l'operatore la scrive in modo dettagliato (per esempio "Mario Rossi, 45 anni, operato al ginocchio destro il 12 marzo"). Il sistema non impedisce questo, ma non lo richiede e non lo incoraggia.
 
 I report generati sono salvati in locale su disco, in chiaro. In un uso reale servirebbe cifratura a riposo e un periodo di conservazione definito.
 
@@ -128,7 +128,7 @@ Il report narrativo generato dal Reporter è in linguaggio semplice, non tecnico
 
 **Onestà sulle limitazioni**
 
-Il sistema dichiara esplicitamente di non essere un dispositivo medico, di non aver ricevuto validazione clinica, di non sostituire il fisioterapista. Questa dichiarazione è ripetuta nel README e nella presente revisione, ed è visibile all'utente nella schermata di completamento della sessione.
+Il sistema dichiara esplicitamente di nom sostituire un medico, di non aver ricevuto validazione clinica, di non sostituire il fisioterapista. Questa dichiarazione è ripetuta nel README e nella presente revisione, ed è visibile all'utente nella schermata di completamento della sessione.
 
 ---
 
@@ -138,11 +138,11 @@ Il sistema ha limitazioni che conosciamo e che non nascondiamo.
 
 **Nessuna validazione clinica**
 
-Il sistema non è stato testato su pazienti reali. È un prototipo tecnologico, non un dispositivo medico. Non può essere usato in ambito clinico senza una validazione formale, che richiederebbe studi controllati, approvazione di un comitato etico, e certificazione come dispositivo medico di classe appropriata.
+Il sistema non è stato testato su pazienti reali.
 
 **Nessun consenso informato formale**
 
-Il prototipo non implementa un consenso informato formale. In un uso reale servirebbe un documento scritto che spieghi al paziente come funziona il sistema, quali dati vengono conservati, per quanto tempo, e come possono essere cancellati. Il sistema non ha un meccanismo per raccogliere questo consenso.
+Il prototipo non implementa un consenso informato formale. In un uso reale servirebbe un documento scritto che spieghi al paziente come funziona il sistema, quali dati vengono conservati, per quanto tempo, e come possono essere cancellati. Il sistema non ha ancora un meccanismo per raccogliere questo consenso.
 
 **Nessuna cifratura dei dati a riposo**
 
@@ -182,6 +182,6 @@ Il sistema produce un file `debug.log` con tutte le chiamate e le risposte degli
 
 Kinect Rehab Coach è un prototipo tecnologico che affronta un problema reale: la carenza di supervisione quotidiana nella riabilitazione fisioterapica. Il sistema è progettato con scelte etiche esplicite: privacy by design, human-in-the-loop, separazione tra deterministico e intelligente, validazione strutturale e clinica dei contenuti generati dall'AI.
 
-Il sistema non è un dispositivo medico, non è validato clinicamente, e non sostituisce il fisioterapista. Queste non sono dichiarazioni di facciata: sono il presupposto su cui il progetto è costruito. Il valore del prototipo è dimostrare che un'architettura agentica multi-AI può essere progettata in modo responsabile, con limiti chiari e con una separazione netta tra ciò che l'AI può fare e ciò che non deve fare.
+Il sistema non sostituisce un medico e non è validato clinicamente. Queste non sono dichiarazioni di facciata: sono il presupposto su cui il progetto è costruito. Il valore del prototipo è dimostrare che un'architettura agentica multi-AI può essere progettata in modo responsabile, con limiti chiari e con una separazione netta tra ciò che l'AI può fare e ciò che non deve fare.
 
 Le limitazioni sono dichiarate apertamente perché un sistema che nasconde i propri limiti è più pericoloso di un sistema che li esplicita. La strada verso un uso clinico reale richiede validazione formale, consenso informato, cifratura dei dati, audit log strutturato, e sostenibilità a lungo termine dell'hardware. Il prototipo è un punto di partenza, non un punto di arrivo.
