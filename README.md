@@ -59,6 +59,7 @@ Il sistema utilizza un sensore di profondità Microsoft Kinect V2 per il traccia
 
 Il principio architetturale fondamentale è la separazione netta tra componenti deterministiche e componenti AI: il calcolo degli angoli articolari, la verifica delle soglie e il conteggio delle ripetizioni sono eseguiti da codice Python e JavaScript, mentre la generazione del programma, la valutazione contestuale, il feedback empatico e la pianificazione adattiva sono delegati a modelli linguistici. Questo garantisce che il sistema sia reattivo (latenza locale inferiore a 50 ms) e che i numeri critici non siano mai soggetti ad allucinazione.
 
+
 ---
 
 ## 2. Architettura generale
@@ -292,7 +293,7 @@ Report narrativo e program_context di ogni sessione completata.
 
 ### 7.1 Generazione del programma
 
-L'utente digita una diagnosi in linguaggio naturale. Il Program Designer analizza la richiesta e decide autonomamente se procedere alla generazione o chiedere chiarimenti.
+L'operatore digita una diagnosi (volendo anche in linguaggio naturale, visto che l'AI è capace di interpretarla). Il Program Designer analizza la richiesta e decide autonomamente se procedere alla generazione o chiedere chiarimenti.
 
 Se la diagnosi è ambigua o mancano informazioni clinicamente rilevanti (fase del trattamento, zona del corpo, controindicazioni), il Program Designer restituisce un massimo di tre domande di chiarimento. Il sistema le mostra nel terminale e raccoglie le risposte. Al secondo giro il Program Designer è obbligato a generare, senza ulteriori domande.
 
@@ -329,7 +330,7 @@ Successivamente il Critic, un secondo agente AI, rivalida la coerenza clinica de
 
 Prima dell'inizio della sessione, il sistema mostra all'utente il programma generato con le istruzioni complete di ogni esercizio. L'utente può:
 - confermare e iniziare (tasto SPAZIO)
-- chiedere modifiche all'AI (tasto R): scrive in linguaggio naturale cosa vuole cambiare, il sistema invia la richiesta con la nota e il programma precedente al Program Designer, che rigenera il programma. Sono consentiti al massimo due tentativi di revisione.
+- chiedere modifiche all'AI con l'aiuto dell'operatore (tasto R): scrive in linguaggio naturale cosa vuole cambiare, il sistema invia la richiesta con la nota e il programma precedente al Program Designer, che rigenera il programma. Sono consentiti al massimo due tentativi di revisione.
 - uscire (tasto ESC)
 
 ### 7.4 Calibrazione personalizzata
@@ -521,12 +522,12 @@ Ogni agente ha un system message dedicato che definisce ruolo, regole, formato d
 ## 10. Flusso completo di una sessione
 
 1. Il programma stampa l'ID sessione e chiede la diagnosi.
-2. L'utente digita la diagnosi in linguaggio naturale.
+2. L'operatore digita la diagnosi in linguaggio naturale.
 3. Il sistema invia la richiesta a n8n. Il Program Designer elabora.
 4. Se il Program Designer chiede chiarimenti, il sistema li mostra e raccoglie le risposte, poi rinvia la richiesta.
 5. Il programma generato viene validato strutturalmente e clinicamente.
 6. Il sistema mostra il programma a schermo con le istruzioni complete.
-7. L'utente conferma con SPAZIO, oppure chiede modifiche con R, oppure esce con ESC.
+7. L'utente/operatore conferma con SPAZIO, oppure chiede modifiche con R, oppure esce con ESC.
 8. Per ogni esercizio:
    - Mostra le istruzioni dell'esercizio
    - Attende SPAZIO
@@ -833,10 +834,10 @@ Il payload inviato agli agenti non contiene nome, età, codice fiscale o altri d
 I report sono salvati in locale nel filesystem. Non vengono trasmessi a servizi esterni. Non vengono conservati video o audio.
 
 **Human-in-the-loop**  
-Il sistema non decide mai autonomamente di iniziare una sessione o di modificare il programma senza conferma dell'utente. Il paziente approva il programma prima dell'inizio, e può chiedere modifiche.
+Il sistema non decide mai autonomamente di iniziare una sessione o di modificare il programma senza conferma dell'operatore. Il programma viene approvato prima dell'inizio, e possono essere richieste modifiche.
 
 **Nessuna autonomia clinica**  
-Il sistema non è un dispositivo medico. Non formula diagnosi. Non sostituisce il fisioterapista. Le raccomandazioni generate dagli agenti AI sono validate internamente da un Critic, ma restano soggette alla supervisione del professionista sanitario.
+Il sistema non sostituisce il fisioterapista. Le raccomandazioni generate dagli agenti AI sono validate internamente da un Critic, ma restano soggette alla supervisione del professionista sanitario.
 
 ---
 
@@ -855,7 +856,7 @@ Nei esercizi bilaterali, il conteggio delle ripetizioni è effettuato sul primo 
 La distinzione tra seduto, in piedi e le altre posture è basata su soglie euristiche su angoli e distanze. Può sbagliare in casi limite (divano con gambe distese, sgabelli alti).
 
 **Nessuna validazione clinica**  
-Il sistema è un prototipo tecnologico. Non è stato testato su pazienti reali né validato clinicamente. Non è un dispositivo medico.
+Il sistema non è stato testato su pazienti reali.
 
 **Calibrazione soggetta a fallimenti**  
 Se il range misurato durante la calibrazione è inferiore a 20 gradi, la calibrazione viene rifiutata e l'utente deve ripetere il movimento. È il comportamento corretto, ma può richiedere più tentativi se l'utente non capisce cosa deve fare.
@@ -903,4 +904,4 @@ Se in futuro si volesse passare a un sensore ancora in produzione, le alternativ
 Il sistema Kinect Rehab Coach è progettato per essere indipendente dal sensore a livello di logica applicativa: il modulo `analisi_angoli.py` e il modulo `stato_step.py` lavorano su coordinate 3D e nomi di giunti, non su API specifiche del Kinect. Sostituire il sensore richiederebbe di adattare il layer di acquisizione (`main_kinect.py`) e il mapper delle coordinate, ma non la logica di calcolo, di calibrazione o di orchestrazione agentica.
 
 
-Il progetto è distribuito con finalità educative. Non è un dispositivo medico. Non sostituisce il parere di un professionista sanitario.
+Non sostituisce il parere di un professionista sanitario.
