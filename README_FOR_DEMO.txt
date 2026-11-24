@@ -5,12 +5,11 @@ I 2 video di YouTube rappresentano il prototipo allo stato attuale: rispecchia c
 funzionante per dimostrare la fattibilità del nostro progetto e gettare le basi per accogliere le modifiche che riteniamo possano essere fatte 
 e che completano la visione che abbiamo per il progetto.
 
-Il file HTML invece è una demo simulativa, che illustra a grandi linee "lo stato dell'arte" che immaginiamo possa raggiungere il nostro progetto,
-seguendo la linea di sviluppo già impostata.
+Il file HTML invece è una demo simulativa e interattiva, che illustra a grandi linee "lo stato dell'arte" che immaginiamo possa raggiungere il nostro progetto,seguendo la linea di sviluppo già impostata. 
 
 I DUE LINK DI YOUTUBE:
 
 1. Video che mostra in tempo reale come funziona n8n associato al terminale e al programma principale: https://youtu.be/9gKcQtkiL3Y
 2. Video che si concentra sul programma principale: https://youtu.be/MqTt0eKb1hk
 
-il file HTML si trova nella root della repository: https://github.com/rizziniccolo/i-gea/
+il file HTML (denominato "demo.html" ) si trova nella root della repository: https://github.com/rizziniccolo/i-gea/
