@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinect Rehab Coach — Sessione Live</title>
+<style>
+:root {
+  --bg-0: #070a12;
+  --bg-1: #0d1220;
+  --bg-2: #131a2c;
+  --bg-3: #1a2338;
+  --border: #243049;
+  --text-1: #e8ecf5;
+  --text-2: #98a2b8;
+  --text-3: #5c6680;
+  --accent: #22d3ee;
+  --accent-2: #38bdf8;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.15);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg-0);
+  color: var(--text-1);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== SELECT SCREEN ===== */
+#screen-select {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px;
+  background: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.08), transparent 60%), var(--bg-0);
+}
+#screen-select.active { display: flex; }
+.logo-big {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 48px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.logo-mark {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--bg-0);
+  font-weight: 900;
+  font-size: 18px;
+}
+.select-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+.select-subtitle { font-size: 15px; color: var(--text-2); margin-bottom: 48px; text-align: center; }
+.patient-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+  width: 100%;
+}
+.patient-select-card {
+  background: var(--bg-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.patient-select-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.patient-select-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 40px rgba(34, 211, 238, 0.15);
+}
+.patient-select-card:hover::before { opacity: 1; }
+.patient-select-avatar {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--bg-0);
+  margin-bottom: 16px;
+}
+.patient-select-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.patient-select-meta { font-size: 12px; color: var(--text-2); margin-bottom: 16px; }
+.patient-select-stats { display: flex; gap: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.patient-select-stat { flex: 1; }
+.patient-select-stat-label { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+.patient-select-stat-value { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 2px; }
+
+/* ===== DASHBOARD ===== */
+#screen-dashboard { display: none; flex-direction: column; height: 100vh; }
+#screen-dashboard.active { display: flex; }
+
+.topbar {
+  height: 64px;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.topbar-spacer { flex: 1; }
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+.status-dot.pulse { animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.main-area {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 320px 1fr 340px;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 2px; }
+
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+.card-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-3);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.patient-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.avatar {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px; color: var(--bg-0);
+  flex-shrink: 0;
+}
+.patient-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.patient-info p { font-size: 11px; color: var(--text-2); }
+.diagnosis-box {
+  padding: 12px;
+  background: var(--bg-3);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.diagnosis-box strong {
+  color: var(--text-1);
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.session-list { display: flex; flex-direction: column; gap: 6px; }
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-3);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+.session-date { color: var(--text-2); font-variant-numeric: tabular-nums; font-size: 10px; min-width: 60px; }
+.session-stats { flex: 1; display: flex; gap: 12px; }
+.session-stat { display: flex; flex-direction: column; }
+.session-stat-label { font-size: 8px; color: var(--text-3); text-transform: uppercase; }
+.session-stat-value { font-weight: 600; font-size: 11px; }
+.session-stat-value.ok { color: var(--success); }
+.session-stat-value.warn { color: var(--warning); }
+
+.chart { display: flex; align-items: flex-end; gap: 6px; height: 60px; padding: 4px 0; }
+.chart-bar {
+  flex: 1;
+  background: var(--bg-3);
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  height: 100%;
+  min-height: 4px;
+}
+.chart-bar-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 3px 3px 0 0;
+  transition: height 0.6s ease-out;
+}
+.chart-label { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--text-3); }
+
+.tag-list { display: flex; flex-direction: column; gap: 6px; }
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--danger-soft);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--danger);
+}
+.tag-icon { font-size: 12px; }
+
+/* ===== STAGE ===== */
+.stage {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.stage-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+  min-height: 0;
+}
+
+.skeleton-svg {
+  height: 100%;
+  max-height: 560px;
+  filter: drop-shadow(0 4px 20px rgba(34, 211, 238, 0.15));
+}
+.limb {
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke 0.2s;
+}
+.limb.active { stroke: var(--accent-2); filter: drop-shadow(0 0 8px var(--accent)); }
+.limb.error { stroke: var(--danger); filter: drop-shadow(0 0 12px var(--danger)); }
+.joint { fill: var(--accent-2); filter: drop-shadow(0 0 6px var(--accent)); }
+.head { fill: var(--bg-3); stroke: var(--accent); stroke-width: 5; }
+.torso { stroke: var(--accent); stroke-width: 6; stroke-linecap: round; fill: none; }
+.ground { fill: rgba(34, 211, 238, 0.05); }
+
+.angle-readout {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(13, 18, 32, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  min-width: 160px;
+  z-index: 5;
+}
+.angle-readout.hidden, .phase-indicator.hidden { display: none; }
+.angle-readout .label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; }
+.angle-readout .value {
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-top: 4px;
+  transition: color 0.2s;
+}
+.angle-readout .value.error { color: var(--danger); }
+.angle-readout .target { font-size: 11px; color: var(--text-2); margin-top: 4px; }
+
+.phase-indicator {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(13, 18, 32, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  text-align: right;
+  z-index: 5;
+}
+.phase-indicator .label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; }
+.phase-indicator .value { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+.phase-indicator .rep { font-size: 11px; color: var(--text-2); margin-top: 6px; }
+
+.start-btn {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 16px 48px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--bg-0);
+  border: none;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(34, 211, 238, 0.4);
+  transition: all 0.3s;
+  font-family: var(--font);
+  z-index: 10;
+}
+.start-btn:hover {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(34, 211, 238, 0.6);
+}
+.start-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.start-btn.hidden { display: none; }
+
+/* ===== RIGHT PANEL ===== */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.right-panel::-webkit-scrollbar { width: 4px; }
+.right-panel::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 2px; }
+
+.correction-item {
+  padding: 12px 14px;
+  background: var(--danger-soft);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: var(--radius-sm);
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.correction-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--danger);
+  animation: pulseBorder 1s ease-in-out infinite;
+}
+@keyframes pulseBorder {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.correction-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.correction-icon {
+  width: 18px; height: 18px;
+  background: var(--danger);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 11px; font-weight: 700; flex-shrink: 0;
+  animation: pulse 1s ease-in-out infinite;
+}
+.correction-label { font-weight: 600; font-size: 12px; color: var(--danger); }
+.correction-value { font-size: 10px; color: var(--text-2); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.correction-bar { height: 4px; background: rgba(248, 113, 113, 0.2); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.correction-bar-fill { height: 100%; background: var(--danger); border-radius: 2px; transition: width 0.3s; }
+
+.no-corrections { padding: 20px 14px; text-align: center; color: var(--success); font-size: 12px; }
+.no-corrections .icon { font-size: 28px; margin-bottom: 6px; }
+
+.tts-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.tts-log::-webkit-scrollbar { width: 3px; }
+.tts-log::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 2px; }
+.tts-message {
+  padding: 8px 10px;
+  background: var(--bg-3);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-2);
+  animation: fadeIn 0.4s;
+}
+.tts-message.error { border-color: var(--danger); color: var(--text-1); }
+.tts-message .time { font-size: 9px; color: var(--text-3); display: block; margin-bottom: 3px; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== BOTTOM BAR ===== */
+.bottombar {
+  height: 56px;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  flex-shrink: 0;
+}
+.progress-global { flex: 1; height: 6px; background: var(--bg-3); border-radius: 3px; overflow: hidden; }
+.progress-global-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  width: 0%;
+  transition: width 0.3s;
+}
+.bottombar-info { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; min-width: 100px; }
+.bottombar-info:last-child { text-align: right; }
+
+/* ===== FLASH OVERLAY ===== */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: inset 0 0 120px 20px rgba(248, 113, 113, 0.7);
+}
+.flash-overlay.active { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN: SELECT -->
+<div id="screen-select" class="screen active">
+  <div class="logo-big">
+    <div class="logo-mark">K</div>
+    <span>KINECT REHAB COACH</span>
+  </div>
+  <h1 class="select-title">Seleziona il paziente</h1>
+  <p class="select-subtitle">Scegli un profilo per visualizzare lo storico e iniziare la sessione</p>
+  <div class="patient-grid" id="patient-grid"></div>
+</div>
+
+<!-- SCREEN: DASHBOARD -->
+<div id="screen-dashboard" class="screen">
+  <div class="topbar">
+    <div class="logo-big" style="margin: 0; font-size: 14px;">
+      <div class="logo-mark" style="width: 28px; height: 28px; font-size: 14px;">K</div>
+      <span>KINECT REHAB COACH</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="status-pill">
+      <span class="status-dot pulse" id="status-dot"></span>
+      <span id="status-text">Sistema pronto</span>
+    </div>
+  </div>
+  
+  <div class="main-area">
+    <aside class="sidebar">
+      <div class="card">
+        <div class="patient-header">
+          <div class="avatar" id="patient-avatar">--</div>
+          <div class="patient-info">
+            <h3 id="patient-name">--</h3>
+            <p id="patient-meta">--</p>
+          </div>
+        </div>
+        <div class="diagnosis-box">
+          <strong>Diagnosi</strong>
+          <span id="patient-diagnosis">--</span>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Progresso ROM</div>
+        <div class="chart" id="progress-chart"></div>
+        <div class="chart-label"><span>Sess. 1</span><span>Oggi</span></div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Sessioni precedenti</div>
+        <div class="session-list" id="session-list"></div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Problematiche ricorrenti</div>
+        <div class="tag-list" id="problem-list"></div>
+      </div>
+    </aside>
+    
+    <section class="stage">
+      <div class="stage-content">
+        <svg class="skeleton-svg" viewBox="0 0 400 500" id="skeleton">
+          <defs>
+            <linearGradient id="grad-accent" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+          
+          <!-- Ground shadow -->
+          <ellipse class="ground" cx="200" cy="445" rx="120" ry="12"/>
+          
+          <!-- Head -->
+          <circle class="head" cx="200" cy="60" r="28"/>
+          
+          <!-- Torso -->
+          <line class="torso" x1="200" y1="88" x2="200" y2="115"/>
+          <line class="torso" x1="200" y1="115" x2="200" y2="240"/>
+          
+          <!-- Shoulders -->
+          <line class="torso" x1="160" y1="120" x2="240" y2="120" stroke-width="5"/>
+          
+          <!-- Hips -->
+          <line class="torso" x1="170" y1="240" x2="230" y2="240" stroke-width="5"/>
+          
+          <!-- Left arm (static) -->
+          <g>
+            <line class="limb" x1="160" y1="120" x2="140" y2="195"/>
+            <line class="limb" x1="140" y1="195" x2="130" y2="265"/>
+            <circle class="joint" cx="130" cy="265" r="4"/>
+          </g>
+          
+          <!-- Ghost position (target reference) -->
+          <g opacity="0.35">
+            <line x1="240" y1="120" x2="240" y2="195" stroke="#243049" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/>
+            <line x1="240" y1="195" x2="240" y2="265" stroke="#243049" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/>
+          </g>
+          
+          <!-- Right arm (animated) -->
+          <g id="right-arm-shoulder">
+            <line class="limb active" id="upper-arm-right" x1="240" y1="120" x2="240" y2="195"/>
+            <g id="right-forearm">
+              <line class="limb active" id="forearm-right" x1="240" y1="195" x2="240" y2="265"/>
+              <circle class="joint" cx="240" cy="265" r="4"/>
+            </g>
+            <circle class="joint" cx="240" cy="195" r="4"/>
+          </g>
+          
+          <!-- Left leg -->
+          <g>
+            <line class="limb" x1="170" y1="240" x2="175" y2="330"/>
+            <line class="limb" x1="175" y1="330" x2="180" y2="420"/>
+            <circle class="joint" cx="180" cy="420" r="4"/>
+          </g>
+          
+          <!-- Right leg -->
+          <g>
+            <line class="limb" x1="230" y1="240" x2="225" y2="330"/>
+            <line class="limb" x1="225" y1="330" x2="220" y2="420"/>
+            <circle class="joint" cx="220" cy="420" r="4"/>
+          </g>
+        </svg>
+      </div>
+      
+      <div class="angle-readout hidden" id="angle-readout">
+        <div class="label">Angolo spalla</div>
+        <div class="value" id="angle-value">0°</div>
+        <div class="target" id="angle-target">target: --</div>
+      </div>
+      
+      <div class="phase-indicator hidden" id="phase-indicator">
+        <div class="label">Fase corrente</div>
+        <div class="value" id="phase-name">--</div>
+        <div class="rep" id="rep-info">--</div>
+      </div>
+      
+      <button class="start-btn" id="start-btn">Inizia ad esercitarti</button>
+    </section>
+    
+    <aside class="right-panel">
+      <div class="card">
+        <div class="card-title">Correzioni live</div>
+        <div id="corrections-container">
+          <div class="no-corrections">
+            <div class="icon">&#10003;</div>
+            <div>Postura corretta</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Coach AI</div>
+        <div class="tts-log" id="tts-log"></div>
+      </div>
+    </aside>
+  </div>
+  
+  <div class="bottombar">
+    <div class="bottombar-info" id="bottombar-left">Pronto</div>
+    <div class="progress-global"><div class="progress-global-fill" id="progress-fill"></div></div>
+    <div class="bottombar-info" id="bottombar-right">0%</div>
+  </div>
+</div>
+
+<div class="flash-overlay" id="flash-overlay"></div>
+
+<script>
+// ===== DATA =====
+const PAZIENTI = [
+  {
+    id: 'mario', nome: 'Mario Rossi', iniziali: 'MR', eta: 58,
+    diagnosi: 'Riabilitazione post-operatoria spalla destra. Fase subacuta, settimana 4. Lieve rigidità residua in flessione. Tende a compensare con il tronco quando si stanca.',
+    sessioni: [
+      { data: '2026-11-15', esercizi: 3, rom: 105, errori: 4 },
+      { data: '2026-11-18', esercizi: 3, rom: 112, errori: 3 },
+      { data: '2026-11-21', esercizi: 3, rom: 118, errori: 2 },
+    ],
+    problemi: ['Spalla elevata (frequente)', 'Tronco inclinato in flessione', 'Gomito lontano dal corpo'],
+    romTarget: 165,
+  },
+  {
+    id: 'anna', nome: 'Anna Bianchi', iniziali: 'AB', eta: 42,
+    diagnosi: 'Recupero funzionale ginocchio sinistro dopo lesione legamentosa. Buona compliance, mobilità in miglioramento.',
+    sessioni: [
+      { data: '2026-11-14', esercizi: 4, rom: 95, errori: 2 },
+      { data: '2026-11-17', esercizi: 4, rom: 108, errori: 2 },
+      { data: '2026-11-20', esercizi: 4, rom: 122, errori: 1 },
+    ],
+    problemi: ['Valgo dinamico', 'Estensione incompleta'],
+    romTarget: 175,
+  },
+  {
+    id: 'luca', nome: 'Luca Verdi', iniziali: 'LV', eta: 65,
+    diagnosi: 'Prima valutazione. Rigidità articolare spalla sinistra e ginocchio destro. Nessuna sessione precedente registrata.',
+    sessioni: [],
+    problemi: [],
+    romTarget: 160,
+  },
+];
+
+// ===== STATE =====
+const state = {
+  patient: null,
+  exercise: {
+    active: false,
+    done: false,
+    phase: 'idle',
+    phaseIndex: 0,
+    rep: 0,
+    repTotal: 3,
+    tStart: 0,
+    tPhaseStart: 0,
+    lastFrame: 0,
+    lastEncouragement: 0,
+    angle: 10,
+  },
+  corrections: [],
+  correctionScript: [],
+  raf: null,
+};
+
+// ===== TTS =====
+const tts = {
+  synth: window.speechSynthesis,
+  voice: null,
+  lastSpeak: 0,
+  init() {
+    if (!this.synth) return;
+    const load = () => {
+      const voices = this.synth.getVoices();
+      this.voice = voices.find(v => v.lang.toLowerCase().startsWith('it')) || voices[0] || null;
+    };
+    if (this.synth.getVoices().length) load();
+    this.synth.onvoiceschanged = load;
+  },
+  speak(text, priority = 'normal') {
+    if (!this.synth || !text) return;
+    const now = Date.now();
+    if (priority === 'normal' && now - this.lastSpeak < 1500) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'it-IT';
+    u.rate = 1.05;
+    u.pitch = 1.0;
+    if (this.voice) u.voice = this.voice;
+    this.synth.speak(u);
+    this.lastSpeak = now;
+    addTTSLog(text, priority === 'high' ? 'error' : 'normal');
+  },
+};
+
+// ===== UTIL =====
+function smoothstep(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+
+// ===== RENDER PATIENT GRID =====
+function renderPatientGrid() {
+  const grid = document.getElementById('patient-grid');
+  grid.innerHTML = '';
+  PAZIENTI.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'patient-select-card';
+    const last = p.sessioni[p.sessioni.length - 1];
+    card.innerHTML = `
+      <div class="patient-select-avatar">${p.iniziali}</div>
+      <div class="patient-select-name">${p.nome}</div>
+      <div class="patient-select-meta">${p.eta} anni · ${p.sessioni.length} sessioni</div>
+      <div class="patient-select-stats">
+        <div class="patient-select-stat">
+          <div class="patient-select-stat-label">Ultima ROM</div>
+          <div class="patient-select-stat-value">${last ? last.rom + '°' : '—'}</div>
+        </div>
+        <div class="patient-select-stat">
+          <div class="patient-select-stat-label">Errori</div>
+          <div class="patient-select-stat-value">${last ? last.errori : '—'}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => selectPatient(p));
+    grid.appendChild(card);
+  });
+}
+
+function selectPatient(p) {
+  state.patient = p;
+  document.getElementById('screen-select').classList.remove('active');
+  document.getElementById('screen-dashboard').classList.add('active');
+  
+  document.getElementById('patient-avatar').textContent = p.iniziali;
+  document.getElementById('patient-name').textContent = p.nome;
+  document.getElementById('patient-meta').textContent = `${p.eta} anni · ${p.sessioni.length} sessioni`;
+  document.getElementById('patient-diagnosis').textContent = p.diagnosi;
+  
+  renderProgressChart(p);
+  renderSessionList(p);
+  renderProblemList(p);
+  resetExerciseUI();
+  
+  document.getElementById('status-text').textContent = 'Paziente selezionato';
+  tts.init();
+  setTimeout(() => {
+    tts.speak(`Paziente ${p.nome} selezionato. Premi inizia ad esercitarti per cominciare.`, 'high');
+  }, 400);
+}
+
+function renderProgressChart(p) {
+  const chart = document.getElementById('progress-chart');
+  chart.innerHTML = '';
+  const maxRom = p.romTarget || 180;
+  const roms = p.sessioni.map(s => s.rom);
+  const all = roms.length ? [...roms, roms[roms.length - 1] + 5] : [30];
+  all.forEach((val) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar';
+    const fill = document.createElement('div');
+    fill.className = 'chart-bar-fill';
+    fill.style.height = Math.max(6, (val / maxRom) * 100) + '%';
+    bar.appendChild(fill);
+    chart.appendChild(bar);
+  });
+}
+
+function renderSessionList(p) {
+  const list = document.getElementById('session-list');
+  list.innerHTML = '';
+  if (!p.sessioni.length) {
+    list.innerHTML = '<div style="color: var(--text-3); font-size: 11px; padding: 8px;">Nessuna sessione precedente</div>';
+    return;
+  }
+  p.sessioni.slice().reverse().forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'session-item';
+    item.innerHTML = `
+      <div class="session-date">${s.data}</div>
+      <div class="session-stats">
+        <div class="session-stat">
+          <span class="session-stat-label">ROM</span>
+          <span class="session-stat-value ok">${s.rom}°</span>
+        </div>
+        <div class="session-stat">
+          <span class="session-stat-label">Errori</span>
+          <span class="session-stat-value ${s.errori > 2 ? 'warn' : 'ok'}">${s.errori}</span>
+        </div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function renderProblemList(p) {
+  const list = document.getElementById('problem-list');
+  list.innerHTML = '';
+  if (!p.problemi.length) {
+    list.innerHTML = '<div style="color: var(--text-3); font-size: 11px; padding: 8px;">Nessuna problematica</div>';
+    return;
+  }
+  p.problemi.forEach(txt => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `<span class="tag-icon">&#9888;</span><span>${txt}</span>`;
+    list.appendChild(tag);
+  });
+}
+
+// ===== EXERCISE =====
+const PHASES = [
+  { name: 'Preparazione', duration: 3000, targetLo: 0, targetHi: 20, type: 'hold' },
+  { name: 'Flessione in avanti', duration: 3000, targetLo: 150, targetHi: 170, type: 'up' },
+  { name: 'Mantenimento', duration: 2000, targetLo: 150, targetHi: 170, type: 'hold' },
+  { name: 'Ritorno', duration: 3000, targetLo: 0, targetHi: 20, type: 'down' },
+];
+
+const CORRECTIONS_DEF = [
+  { id: 'trunk', label: 'Tronco inclinato', threshold: 10, unit: '°', tts: 'Raddrizza il tronco, stai compensando con la schiena.' },
+  { id: 'shoulder', label: 'Spalla sollevata', threshold: 8, unit: '°', tts: 'Rilassa la spalla destra, non tirarla verso l\'orecchio.' },
+  { id: 'elbow', label: 'Gomito lontano dal corpo', threshold: 12, unit: 'cm', tts: 'Tieni il gomito vicino al fianco durante il movimento.' },
+];
+
+function resetExerciseUI() {
+  state.exercise.active = false;
+  state.exercise.done = false;
+  state.exercise.phase = 'idle';
+  state.exercise.phaseIndex = 0;
+  state.exercise.rep = 0;
+  state.corrections = [];
+  const btn = document.getElementById('start-btn');
+  btn.classList.remove('hidden');
+  btn.disabled = false;
+  btn.textContent = 'Inizia ad esercitarti';
+  document.getElementById('angle-readout').classList.add('hidden');
+  document.getElementById('phase-indicator').classList.add('hidden');
+  document.getElementById('corrections-container').innerHTML = `
+    <div class="no-corrections"><div class="icon">&#10003;</div><div>Postura corretta</div></div>
+  `;
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('bottombar-right').textContent = '0%';
+  document.getElementById('bottombar-left').textContent = 'Pronto';
+  updateSkeletonAngle(10);
+  document.getElementById('upper-arm-right').classList.remove('error');
+  document.getElementById('forearm-right').classList.remove('error');
+  document.getElementById('flash-overlay').classList.remove('active');
+}
+
+function startExercise() {
+  state.exercise.active = true;
+  state.exercise.done = false;
+  state.exercise.phase = 'calibration';
+  state.exercise.phaseIndex = 0;
+  state.exercise.rep = 0;
+  state.exercise.tStart = performance.now();
+  state.exercise.lastFrame = performance.now();
+  state.exercise.lastEncouragement = 0;
+  state.exercise.angle = 10;
+  state.corrections = [];
+  
+  document.getElementById('start-btn').classList.add('hidden');
+  document.getElementById('angle-readout').classList.remove('hidden');
+  document.getElementById('phase-indicator').classList.remove('hidden');
+  document.getElementById('status-text').textContent = 'Sessione in corso';
+  
+  tts.speak('Calibrazione in corso. Esegui il movimento due volte, lentamente e in modo ampio.', 'high');
+  
+  scheduleCorrections();
+  
+  if (state.raf) cancelAnimationFrame(state.raf);
+  state.raf = requestAnimationFrame(exerciseLoop);
+}
+
+function scheduleCorrections() {
+  state.correctionScript = [
+    { rep: 1, phase: 1, at: 0.4, ids: ['trunk', 'shoulder'], dur: 2600, done: false },
+    { rep: 1, phase: 2, at: 0.3, ids: ['elbow'], dur: 1800, done: false },
+    { rep: 2, phase: 1, at: 0.5, ids: ['trunk', 'elbow'], dur: 2400, done: false },
+    { rep: 2, phase: 3, at: 0.4, ids: ['shoulder'], dur: 1800, done: false },
+  ];
+}
+
+function exerciseLoop(now) {
+  if (!state.exercise.active) return;
+  const ex = state.exercise;
+  const elapsed = now - ex.tStart;
+  
+  if (ex.phase === 'calibration') {
+    const prog = Math.min(1, elapsed / 5000);
+    document.getElementById('phase-name').textContent = 'Calibrazione';
+    document.getElementById('rep-info').textContent = `${Math.round(prog * 100)}% completata`;
+    document.getElementById('bottombar-left').textContent = 'Calibrazione';
+    document.getElementById('progress-fill').style.width = (prog * 15) + '%';
+    document.getElementById('bottombar-right').textContent = Math.round(prog * 15) + '%';
+    const calibAngle = 10 + (140 * (0.5 + 0.5 * Math.sin(elapsed / 500)));
+    updateSkeletonAngle(calibAngle);
+    document.getElementById('angle-value').textContent = Math.round(calibAngle) + '°';
+    document.getElementById('angle-target').textContent = 'misurazione range';
+    if (prog >= 1) {
+      ex.phase = 'movement';
+      ex.phaseIndex = 0;
+      ex.rep = 0;
+      ex.tStart = now;
+      ex.tPhaseStart = now;
+      tts.speak('Calibrazione completata. Iniziamo con la prima ripetizione.', 'high');
+    }
+  } else if (ex.phase === 'movement') {
+    const phase = PHASES[ex.phaseIndex];
+    const phaseElapsed = now - ex.tPhaseStart;
+    const phaseProg = Math.min(1, phaseElapsed / phase.duration);
+    
+    let targetAngle;
+    if (phase.type === 'hold') {
+      targetAngle = (phase.targetLo + phase.targetHi) / 2 + Math.sin(now / 300) * 2;
+    } else if (phase.type === 'up') {
+      const lo = PHASES[0].targetHi, hi = phase.targetHi;
+      targetAngle = lo + (hi - lo) * smoothstep(phaseProg);
+    } else {
+      const lo = PHASES[2].targetLo, hi = PHASES[2].targetHi;
+      targetAngle = hi - (hi - lo) * smoothstep(phaseProg);
+    }
+    
+    ex.angle = targetAngle;
+    updateSkeletonAngle(targetAngle);
+    document.getElementById('angle-value').textContent = Math.round(targetAngle) + '°';
+    document.getElementById('angle-target').textContent = `target: ${phase.targetLo}-${phase.targetHi}°`;
+    document.getElementById('phase-name').textContent = phase.name;
+    document.getElementById('rep-info').textContent = `Ripetizione ${ex.rep + 1}/${ex.repTotal}`;
+    
+    const repPhaseTotal = ex.repTotal * PHASES.length;
+    const done = ex.rep * PHASES.length + ex.phaseIndex + phaseProg;
+    const globalProg = 15 + (done / repPhaseTotal) * 85;
+    document.getElementById('progress-fill').style.width = globalProg + '%';
+    document.getElementById('bottombar-right').textContent = Math.round(globalProg) + '%';
+    document.getElementById('bottombar-left').textContent = `Rip. ${ex.rep + 1}/${ex.repTotal} · ${phase.name}`;
+    
+    checkScriptedCorrections(ex.rep, ex.phaseIndex, phaseProg, now);
+    updateCorrections(now);
+    
+    // Periodic encouragement
+    if (now - ex.lastEncouragement > 5000 && state.corrections.length === 0) {
+      ex.lastEncouragement = now;
+      const pool = ['Ottimo controllo della spalla.', 'Movimento fluido, continua così.', 'Perfetto, mantieni questo ritmo.', 'Stai andando bene, bravo.'];
+      tts.speak(pool[Math.floor(Math.random() * pool.length)], 'normal');
+    }
+    
+    if (phaseProg >= 1) {
+      ex.phaseIndex++;
+      ex.tPhaseStart = now;
+      if (ex.phaseIndex >= PHASES.length) {
+        ex.phaseIndex = 0;
+        ex.rep++;
+        if (ex.rep >= ex.repTotal) {
+          ex.phase = 'done';
+          ex.active = false;
+          onExerciseComplete();
+          return;
+        }
+      }
+    }
+  }
+  
+  const hasError = state.corrections.length > 0;
+  document.getElementById('upper-arm-right').classList.toggle('error', hasError);
+  document.getElementById('forearm-right').classList.toggle('error', hasError);
+  document.getElementById('angle-value').classList.toggle('error', hasError);
+  document.getElementById('flash-overlay').classList.toggle('active', hasError);
+  
+  state.raf = requestAnimationFrame(exerciseLoop);
+}
+
+function checkScriptedCorrections(rep, phase, prog, now) {
+  state.correctionScript.forEach(s => {
+    if (s.done) return;
+    if (s.rep === rep && s.phase === phase && prog >= s.at) {
+      s.done = true;
+      s.ids.forEach(cid => {
+        const def = CORRECTIONS_DEF.find(c => c.id === cid);
+        if (def) addCorrection(def, s.dur, now);
+      });
+    }
+  });
+}
+
+function addCorrection(def, duration, now) {
+  const existing = state.corrections.find(c => c.id === def.id);
+  if (existing) {
+    existing.expiresAt = now + duration;
+    return;
+  }
+  state.corrections.push({
+    id: def.id, label: def.label,
+    value: def.threshold + 4 + Math.random() * 4,
+    threshold: def.threshold, unit: def.unit,
+    expiresAt: now + duration, createdAt: now,
+  });
+  tts.speak(def.tts, 'high');
+  renderCorrections();
+}
+
+function updateCorrections(now) {
+  const before = state.corrections.length;
+  state.corrections = state.corrections.filter(c => now < c.expiresAt);
+  state.corrections.forEach(c => {
+    c.value = c.threshold + 4 + Math.sin((now - c.createdAt) / 300) * 3;
+  });
+  if (state.corrections.length !== before || state.corrections.length > 0) {
+    renderCorrections();
+  }
+}
+
+function renderCorrections() {
+  const container = document.getElementById('corrections-container');
+  if (state.corrections.length === 0) {
+    container.innerHTML = `<div class="no-corrections"><div class="icon">&#10003;</div><div>Postura corretta</div></div>`;
+    return;
+  }
+  container.innerHTML = '';
+  state.corrections.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'correction-item';
+    const pct = Math.min(100, (c.value / (c.threshold * 2)) * 100);
+    item.innerHTML = `
+      <div class="correction-header">
+        <div class="correction-icon">!</div>
+        <div class="correction-label">${c.label}</div>
+      </div>
+      <div class="correction-value">${c.value.toFixed(1)}${c.unit} · soglia ${c.threshold}${c.unit}</div>
+      <div class="correction-bar"><div class="correction-bar-fill" style="width:${pct}%"></div></div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function updateSkeletonAngle(deg) {
+  const rotate = -deg;
+  document.getElementById('right-arm-shoulder').setAttribute('transform', `rotate(${rotate} 240 120)`);
+  const elbowBend = -10 - (deg / 180) * 15;
+  document.getElementById('right-forearm').setAttribute('transform', `rotate(${elbowBend} 240 195)`);
+}
+
+function onExerciseComplete() {
+  document.getElementById('status-text').textContent = 'Sessione completata';
+  document.getElementById('phase-name').textContent = 'Completato';
+  document.getElementById('rep-info').textContent = `${state.exercise.repTotal}/${state.exercise.repTotal} ripetizioni`;
+  document.getElementById('bottombar-left').textContent = 'Sessione completata';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('bottombar-right').textContent = '100%';
+  document.getElementById('flash-overlay').classList.remove('active');
+  document.getElementById('upper-arm-right').classList.remove('error');
+  document.getElementById('forearm-right').classList.remove('error');
+  state.corrections = [];
+  renderCorrections();
+  
+  const patient = state.patient;
+  const report = `Sessione completata, ${patient.nome.split(' ')[0]}. Hai eseguito ${state.exercise.repTotal} ripetizioni di flessione della spalla destra. Il range articolare è migliorato rispetto alla sessione precedente. Ho rilevato alcune compensazioni con il tronco, ma sono diminuite nelle ultime ripetizioni. Ottimo lavoro, continua così.`;
+  setTimeout(() => tts.speak(report, 'high'), 600);
+  
+  state.exercise.done = true;
+  const btn = document.getElementById('start-btn');
+  btn.textContent = 'Torna al profilo';
+  btn.classList.remove('hidden');
+  btn.disabled = false;
+}
+
+// ===== TTS LOG =====
+function addTTSLog(text, type) {
+  const log = document.getElementById('tts-log');
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const item = document.createElement('div');
+  item.className = 'tts-message' + (type === 'error' ? ' error' : '');
+  item.innerHTML = `<span class="time">${time}</span>${text}`;
+  log.insertBefore(item, log.firstChild);
+  while (log.children.length > 10) log.removeChild(log.lastChild);
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderPatientGrid();
+  tts.init();
+  
+  document.getElementById('start-btn').onclick = () => {
+    if (state.exercise.done) {
+      // Back to select
+      document.getElementById('screen-dashboard').classList.remove('active');
+      document.getElementById('screen-select').classList.add('active');
+      state.patient = null;
+      resetExerciseUI();
+      renderPatientGrid();
+      if (state.raf) cancelAnimationFrame(state.raf);
+    } else if (!state.exercise.active) {
+      startExercise();
+    }
+  };
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (state.raf) cancelAnimationFrame(state.raf);
+      state.exercise.active = false;
+      document.getElementById('screen-dashboard').classList.remove('active');
+      document.getElementById('screen-select').classList.add('active');
+      state.patient = null;
+      resetExerciseUI();
+      renderPatientGrid();
+    }
+  });
+});
+</script>
+</body>
+</html>
